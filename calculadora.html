@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lo que cuesta no responder a tiempo · Brújula IA</title>
+<meta name="description" content="Calculadora gratuita: con cuatro datos de tu negocio, una estimación de cuántas consultas y cuántos euros se pierden al mes por no responder a tiempo. Se calcula en tu navegador y no se guarda nada.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="logo" href="index.html" aria-label="Brújula IA, inicio">
+      <svg viewBox="0 0 32 32" aria-hidden="true">
+        <circle cx="16" cy="16" r="14" fill="none" stroke="currentColor" stroke-width="2"/>
+        <polygon points="16,5 20,16 16,27 12,16" fill="#e08a1e"/>
+        <polygon points="16,5 20,16 12,16" fill="currentColor" opacity=".85"/>
+        <circle cx="16" cy="16" r="2" fill="#fff"/>
+      </svg>
+      Brújula IA
+    </a>
+    <nav><a class="btn" href="index.html#contacto">Hablemos</a></nav>
+  </div>
+</header>
+
+<main class="wrap" style="max-width:720px;padding:40px 16px 64px">
+  <p class="eyebrow">Herramienta gratuita</p>
+  <h1>Lo que cuesta no responder a tiempo</h1>
+  <p class="lead">Cuando alguien pregunta y nadie contesta a tiempo, muchas veces se va a otro sitio. Con cuatro datos de tu negocio te damos una estimación para empezar a hablar con números.</p>
+  <p><strong>Se calcula en tu navegador. No enviamos ni guardamos nada de lo que escribes.</strong></p>
+
+  <form id="f" autocomplete="off" novalidate>
+    <label>Consultas o llamadas de posibles clientes por semana
+      <input name="consultas" inputmode="decimal" required>
+      <small class="muted">Cuenta una semana normal: teléfono, WhatsApp, correo y web.</small></label>
+    <label>% que no se atienden a tiempo (de 0 a 100)
+      <input name="sin" inputmode="decimal" required>
+      <small class="muted">Llamadas perdidas, mensajes sin contestar en el día o presupuestos sin seguimiento.</small></label>
+    <label>% de consultas que acaban en venta cuando sí se atienden (de 0 a 100)
+      <input name="conv" inputmode="decimal" required>
+      <small class="muted">Si no lo sabes, usa una cifra prudente: es una estimación.</small></label>
+    <label>Importe medio de una venta o de un cliente nuevo, en € (sin IVA)
+      <input name="ticket" inputmode="decimal" required>
+      <small class="muted">Lo que deja de media un cliente nuevo.</small></label>
+    <button class="btn" type="submit">Calcular</button>
+  </form>
+
+  <div id="r" class="note" aria-live="polite" hidden></div>
+
+  <h2 style="margin-top:40px">Cómo se calcula</h2>
+  <p class="muted">Consultas por semana × 3,8 semanas laborables al mes (46 al año entre 12) × % sin atender × % de venta × importe medio. No usamos datos de mercado ni de otros negocios: solo lo que tú escribes.</p>
+  <p class="muted">Los porcentajes de recuperación (10, 25 y 50 %) son hipótesis para conversar, no una promesa. El resultado real se mide después, con datos de tu negocio.</p>
+  <p><a class="btn" href="index.html#contacto">Quiero verlo con mi negocio</a></p>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© Brújula IA · España · Presencial en Madrid y alrededores</span>
+    <span><a href="privacidad.html">Privacidad</a> · <a href="aviso-legal.html">Aviso legal</a></span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var MAX = { consultas: 100000, sin: 100, conv: 100, ticket: 10000000 };
+  var SEMANAS_MES = 46 / 12;
+  var ESCENARIOS = [10, 25, 50];
+  var form = document.getElementById("f");
+  var salida = document.getElementById("r");
+  var eur = function (n) { return Math.round(n).toLocaleString("es-ES") + " €"; };
+  var num = function (n) { return (Math.round(n * 10) / 10).toLocaleString("es-ES"); };
+  function leer(nombre) {
+    var n = parseFloat(String(form.elements[nombre].value).replace(",", ".").trim());
+    return isFinite(n) && n >= 0 && n <= MAX[nombre] ? n : null;
+  }
+  function pintar(html) { salida.hidden = false; salida.innerHTML = html; }
+  form.addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    var v = {};
+    for (var k in MAX) {
+      v[k] = leer(k);
+      if (v[k] === null) { pintar("<p>Revisa los datos: los cuatro son obligatorios, no pueden ser negativos y los porcentajes van de 0 a 100.</p>"); return; }
+    }
+    var perdidas = v.consultas * SEMANAS_MES * v.sin / 100;
+    var ventas = perdidas * v.conv / 100;
+    var mes = ventas * v.ticket;
+    if (mes <= 0) { pintar("<p>Con estos datos no sale ninguna pérdida estimada. Si algún dato es cero, revísalo.</p>"); return; }
+    var lis = ESCENARIOS.map(function (p) { return "<li>Si se recuperase el " + p + " %: unos " + eur(mes * 12 * p / 100) + " al año.</li>"; }).join("");
+    pintar("<p>Con estos datos se pierden de media unas <strong>" + num(perdidas) + " consultas al mes</strong>, unas " + num(ventas) +
+      " ventas y <strong>unos " + eur(mes) + " al mes</strong> (" + eur(mes * 12) + " al año).</p><ul>" + lis +
+      "</ul><p class='muted'>Es una estimación hecha solo con tus cifras. Sirve para empezar a hablar, no para prometer resultados.</p>");
+  });
+})();
+</script>
+</body>
+</html>

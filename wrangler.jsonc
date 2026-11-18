@@ -1,0 +1,11 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "brujula-ia-web",
+  "pages_build_output_dir": "./dist",
+  "compatibility_date": "2026-11-18",
+  "vars": {
+    "SITE_ID": "brujula-ia-web",
+    "CONTACT_ENABLED": "false",
+    "LEGAL_READY": "false"
+  }
+}

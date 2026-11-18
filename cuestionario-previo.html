@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cuestionario previo · Brújula IA</title>
+<meta name="description" content="Cuéntanos en 10 minutos cómo funciona tu negocio. Sin cuentas, sin envío automático de datos.">
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<main class="wrap" style="max-width:720px;padding:24px 16px">
+  <p class="eyebrow">Brújula IA</p>
+  <h1>Cuestionario previo</h1>
+  <p>Son unas 8 preguntas y se tardan unos 10 minutos. Así llegamos a la primera conversación sabiendo ya cómo trabajas y no te hacemos repetir lo básico.</p>
+  <p>¿Todavía no estás seguro? Puedes leer antes la <a href="guias/por-donde-empezar-con-ia.pdf">guía «Por dónde empezar con la IA en un negocio pequeño»</a>. Se descarga sin dejar ningún dato.</p>
+  <p><strong>Tus datos no se envían a ningún sitio desde esta página.</strong> Al terminar se genera un código de texto que copias y nos mandas tú por correo o WhatsApp, cuando quieras. Si cierras la página sin enviarlo, no queda nada guardado.</p>
+
+  <form id="f" autocomplete="off">
+    <p><label>Nombre de tu negocio *<br><input name="nombre" required maxlength="120" style="width:100%"></label></p>
+    <p><label>Tu nombre y cómo prefieres que te contactemos (correo o teléfono) *<br><input name="contacto" required maxlength="200" style="width:100%"></label></p>
+    <p><label>Sector<br>
+      <select name="sector" style="width:100%">
+        <option value="">Elige uno</option>
+        <option value="comercio">Comercio minorista</option>
+        <option value="talleres">Talleres y oficios</option>
+        <option value="despachos">Despachos profesionales (gestoría, asesoría, abogados)</option>
+        <option value="otro">Otro</option>
+      </select></label></p>
+    <p><label>¿A qué te dedicas exactamente?<br><input name="actividad" maxlength="200" style="width:100%"></label></p>
+    <p><label>¿Dónde está tu negocio?<br>
+      <select name="ubicacion" style="width:100%">
+        <option value="">Elige una</option>
+        <option value="madrid_ciudad">Madrid capital</option>
+        <option value="madrid_ccaa">Comunidad de Madrid (otro municipio)</option>
+        <option value="otra">Otra comunidad autónoma</option>
+      </select></label></p>
+    <p><label>¿Cuántas personas sois en el equipo?<br><input name="empleados" maxlength="20" style="width:100%"></label></p>
+    <p><label>¿Qué programas o herramientas usáis hoy? (hojas de cálculo, facturación, WhatsApp, etc.)<br><textarea name="herramientas" rows="3" maxlength="600" style="width:100%"></textarea></label></p>
+    <p><label>Las tres tareas que más tiempo os quitan o más os molestan, con tus palabras<br><textarea name="dolores" rows="4" maxlength="1000" style="width:100%"></textarea></label></p>
+    <p><label>¿Qué te gustaría haber conseguido dentro de un año?<br><textarea name="objetivo" rows="3" maxlength="600" style="width:100%"></textarea></label></p>
+
+    <fieldset style="margin:16px 0;padding:12px">
+      <legend>Consentimiento</legend>
+      <p><label><input type="checkbox" id="cons" required>
+      Acepto que Brújula IA use los datos de este cuestionario <strong>solo</strong> para prepararme una conversación y, si lo pido, un diagnóstico, y que me contacte para ello.
+      Puedo pedir que se borren en cualquier momento. Más información en la <a href="privacidad.html">política de privacidad</a>.</label></p>
+      <p class="m">No incluyas datos de tus clientes ni datos de salud. Con lo que has escrito es suficiente.</p>
+    </fieldset>
+    <button class="btn" type="submit">Generar mi código</button>
+  </form>
+
+  <section id="salida" hidden>
+    <h2>Ya casi está</h2>
+    <p>Copia este código y envíalo a <strong>mariosanber@gmail.com</strong> (por correo o WhatsApp). No contiene nada que no hayas escrito arriba.</p>
+    <textarea id="codigo" rows="6" readonly style="width:100%"></textarea>
+    <p><button class="btn" id="copiar" type="button">Copiar código</button> <span id="ok" role="status"></span></p>
+  </section>
+</main>
+<script>
+const f = document.getElementById('f');
+f.addEventListener('submit', function (ev) {
+  ev.preventDefault();
+  const d = {};
+  new FormData(f).forEach(function (v, k) { d[k] = String(v).trim(); });
+  d.v = 1;
+  d.consentimiento = { aceptado: document.getElementById('cons').checked, fecha: new Date().toISOString().slice(0, 10), texto: '2026-11' };
+  const json = JSON.stringify(d);
+  const bytes = new TextEncoder().encode(json);
+  let bin = '';
+  bytes.forEach(function (b) { bin += String.fromCharCode(b); });
+  document.getElementById('codigo').value = 'BRUJULA-PREVIO-1:' + btoa(bin);
+  document.getElementById('salida').hidden = false;
+  document.getElementById('salida').scrollIntoView();
+});
+document.getElementById('copiar').addEventListener('click', function () {
+  const t = document.getElementById('codigo');
+  t.select();
+  const ok = document.getElementById('ok');
+  (navigator.clipboard ? navigator.clipboard.writeText(t.value) : Promise.reject()).then(
+    function () { ok.textContent = 'Copiado.'; },
+    function () { document.execCommand('copy'); ok.textContent = 'Copiado.'; });
+});
+</script>
+</body>
+</html>
